@@ -17,12 +17,12 @@ import static org.junit.jupiter.api.Assertions.*;
 @Rollback(value = false)
 class MemberRepositoryTest {
 
-    @Autowired MemberRepository memberRepository;
+    @Autowired
+    MemberRepository memberRepository;
 
     @Test
     void testMember() {
-        Member member = new Member();
-        member.setUsername("memberA");
+        Member member = new Member("memberA", 10, null);
 
         Member first = memberRepository.save(member);
         Member second = memberRepository.findById(first.getId()).get();
