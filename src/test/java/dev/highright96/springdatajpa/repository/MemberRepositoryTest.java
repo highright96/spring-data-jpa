@@ -2,6 +2,7 @@ package dev.highright96.springdatajpa.repository;
 
 import dev.highright96.springdatajpa.entity.Member;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -35,7 +36,7 @@ class MemberRepositoryTest {
     }
 
     @Test
-    void basicCRUD(){
+    void basicCRUD() {
         Member member1 = new Member("member1");
         Member member2 = new Member("member2");
 
@@ -59,5 +60,19 @@ class MemberRepositoryTest {
 
         long deletedCount = memberRepository.count();
         assertThat(deletedCount).isEqualTo(0);
+    }
+
+    @Test
+    void methodTest() {
+        Member member1 = new Member("member1");
+        Member member2 = new Member("member2");
+        Member member3 = new Member("member3");
+
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+        memberRepository.save(member3);
+
+        List<Member> top3By = memberRepository.findTop3By();
+        Assertions.assertThat(3).isEqualTo(top3By.size());
     }
 }
