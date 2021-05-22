@@ -1,5 +1,6 @@
 package dev.highright96.springdatajpa.repository;
 
+import dev.highright96.springdatajpa.dto.MemberDto;
 import dev.highright96.springdatajpa.entity.Member;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,6 +10,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -85,6 +88,65 @@ class MemberRepositoryTest {
         memberRepository.save(member2);
 
         List<Member> findMember = memberRepository.findByUsername("member1");
-        Assertions.assertThat(member1).isEqualTo(findMember.get(0));
+        Assertions.assertThat(findMember.get(0)).isEqualTo(member1);
+    }
+
+    @Test
+    void query() {
+        Member member1 = new Member("member1", 10);
+
+        memberRepository.save(member1);
+
+        List<Member> findMember = memberRepository.findUser("member1", 10);
+        Assertions.assertThat(findMember.get(0)).isEqualTo(member1);
+    }
+
+    @Test
+    void findUsernameList() {
+        Member member1 = new Member("member1", 10);
+
+        memberRepository.save(member1);
+
+        List<String> findName = memberRepository.findUsernameList();
+        Assertions.assertThat(findName.get(0)).isEqualTo("member1");
+    }
+
+    @Test
+    void findMemberDto() {
+
+        Member member1 = new Member("member1", 10);
+
+        memberRepository.save(member1);
+
+        List<MemberDto> memberDtos = memberRepository.findMemberDto();
+        Assertions.assertThat(memberDtos.get(0).getUsername()).isEqualTo(member1.getUsername());
+    }
+
+    @Test
+    void findByNames() {
+        Member member1 = new Member("member1");
+        Member member2 = new Member("member2");
+        Member member3 = new Member("member3");
+
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+        memberRepository.save(member3);
+
+        List<Member> findMembers = memberRepository.findByNames(Arrays.asList("member1", "member2"));
+        Assertions.assertThat(findMembers.get(0).getUsername()).isEqualTo(member1.getUsername());
+        Assertions.assertThat(findMembers.get(1).getUsername()).isEqualTo(member2.getUsername());
+    }
+
+    @Test
+    void returnType() {
+        Member member1 = new Member("member1");
+        Member member2 = new Member("member2");
+
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+
+        // NullPointException
+        Member findMember = memberRepository.findMemberByUsername("asdasd");
+        System.out.println("findMember = " + findMember.getUsername());
     }
 }
