@@ -2,6 +2,7 @@ package dev.highright96.springdatajpa.repository;
 
 import dev.highright96.springdatajpa.dto.MemberDto;
 import dev.highright96.springdatajpa.entity.Member;
+import dev.highright96.springdatajpa.entity.Team;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.Arrays;
 import java.util.List;
 
@@ -24,6 +27,12 @@ class MemberRepositoryTest {
 
     @Autowired
     MemberRepository memberRepository;
+
+    @Autowired
+    TeamRepository teamRepository;
+
+    @PersistenceContext
+    EntityManager em;
 
     @Test
     void testMember() {
@@ -175,5 +184,43 @@ class MemberRepositoryTest {
         assertThat(members.getTotalPages()).isEqualTo(2);
         assertThat(members.isFirst()).isTrue();
         assertThat(members.hasNext()).isTrue();
+    }
+
+    @Test
+    public void bulkUpdate() throws Exception {
+        //given
+        memberRepository.save(new Member("member1", 10));
+        memberRepository.save(new Member("member2", 19));
+        memberRepository.save(new Member("member3", 20));
+        memberRepository.save(new Member("member4", 21));
+        memberRepository.save(new Member("member5", 40));
+        //when
+        int resultCount = memberRepository.bulkAgePlus(20);
+
+        List<Member> findMembers = memberRepository.findByUsername("member5");
+        Member findMember = findMembers.get(0);
+
+        //then
+        assertThat(resultCount).isEqualTo(3);
+        assertThat(findMember.getAge()).isEqualTo(41);
+    }
+
+    @Test
+    public void findMemberLazy() throws Exception {
+        //given
+        Team teamA = new Team("teamA");
+        Team teamB = new Team("teamB");
+        teamRepository.save(teamA);
+        teamRepository.save(teamB);
+        memberRepository.save(new Member("member1", 10, teamA));
+        memberRepository.save(new Member("member2", 20, teamB));
+        em.flush();
+        em.clear();
+
+        //when
+        List<Member> memberLazy = memberRepository.findMemberLazy();
+        for (Member member : memberLazy) {
+            member.getTeam().getName();
+        }
     }
 }
