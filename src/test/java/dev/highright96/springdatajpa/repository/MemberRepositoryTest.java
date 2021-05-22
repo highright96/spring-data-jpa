@@ -75,4 +75,16 @@ class MemberRepositoryTest {
         List<Member> top3By = memberRepository.findTop3By();
         Assertions.assertThat(3).isEqualTo(top3By.size());
     }
+
+    @Test
+    void namedQuery() {
+        Member member1 = new Member("member1");
+        Member member2 = new Member("member2");
+
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+
+        List<Member> findMember = memberRepository.findByUsername("member1");
+        Assertions.assertThat(member1).isEqualTo(findMember.get(0));
+    }
 }
