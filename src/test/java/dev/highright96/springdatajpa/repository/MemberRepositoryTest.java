@@ -223,4 +223,9 @@ class MemberRepositoryTest {
             member.getTeam().getName();
         }
     }
+
+    @Test
+    void callCustom() {
+        List<Member> memberCustom = memberRepository.findMemberCustom();
+    }
 }

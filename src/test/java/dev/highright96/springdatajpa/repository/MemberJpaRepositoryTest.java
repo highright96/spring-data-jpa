@@ -1,17 +1,17 @@
 package dev.highright96.springdatajpa.repository;
 
 import dev.highright96.springdatajpa.entity.Member;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @Transactional
@@ -23,6 +23,9 @@ class MemberJpaRepositoryTest {
 
     @Autowired
     MemberRepository memberRepository;
+
+    @PersistenceContext
+    EntityManager em;
 
     @Test
     void testMember() {
@@ -87,5 +90,21 @@ class MemberJpaRepositoryTest {
         int resultCount = memberJpaRepository.bulkAgePlus(20);
         //then
         assertThat(resultCount).isEqualTo(3);
+    }
+
+    @Test
+    public void JpaEventBaseEntity() throws Exception {
+        //given
+        Member member = new Member("member1");
+        memberRepository.save(member); //@PrePersist
+        Thread.sleep(100);
+        member.setUsername("member2");
+        em.flush(); //@PreUpdate
+        em.clear();
+        //when
+        Member findMember = memberRepository.findById(member.getId()).get();
+        //then
+        System.out.println("findMember.createdDate = " + findMember.getCreatedDate());
+        System.out.println("findMember.updatedDate = " + findMember.getLastModifiedDate());
     }
 }
