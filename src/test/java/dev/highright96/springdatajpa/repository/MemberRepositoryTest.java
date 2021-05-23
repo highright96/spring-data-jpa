@@ -228,4 +228,16 @@ class MemberRepositoryTest {
     void callCustom() {
         List<Member> memberCustom = memberRepository.findMemberCustom();
     }
+
+    @Test
+    public void findByNativeQuery() {
+        //given
+        memberRepository.save(new Member("member1", 10));
+        memberRepository.save(new Member("member2", 20));
+        em.flush();
+        em.clear();
+
+        //when
+        Member findMember = memberRepository.findByNativeQuery("member1");
+    }
 }

@@ -74,4 +74,8 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberRep
     //메서드 이름으로 쿼리에서 특히 편리하다.
     @EntityGraph(attributePaths = {"team"})
     List<Member> findByUsernameAndAge(String username, int age);
+
+    //네이티브 쿼리
+    @Query(value = "select * from member where username = ?", nativeQuery = true)
+    Member findByNativeQuery(String username);
 }
